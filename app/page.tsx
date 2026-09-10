@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { SiteHeader } from '@/components/site-header'
 import {
   ArrowRight,
@@ -73,11 +74,23 @@ const destinations = [
 ]
 
 export default function Page() {
+  const router = useRouter()
   const [assistantOpen, setAssistantOpen] = useState(false)
   const [saved, setSaved] = useState<string[]>([])
   const [destination, setDestination] = useState('Anywhere')
   const [guestsOpen, setGuestsOpen] = useState(false)
   const [guests, setGuests] = useState(2)
+  const [checkIn, setCheckIn] = useState('')
+  const [checkOut, setCheckOut] = useState('')
+
+  function handleSearch() {
+    const params = new URLSearchParams()
+    if (destination.trim() && destination !== 'Anywhere') params.set('location', destination.trim())
+    if (guests) params.set('guests', String(guests))
+    if (checkIn) params.set('checkIn', checkIn)
+    if (checkOut) params.set('checkOut', checkOut)
+    router.push(`/rooms?${params.toString()}`)
+  }
 
   const toggleSaved = (name: string) =>
     setSaved((current) =>
@@ -90,7 +103,7 @@ export default function Page() {
 
       <section className="relative overflow-hidden pb-14 pt-12 md:pt-16" id="top">
         <div className="shell relative">
-          <div className="absolute -right-28 top-0 h-[26rem] w-[26rem] rounded-full bg-sky-200/60 blur-3xl" />
+          <div className="absolute -right-28 top-0 h-[26rem] w-[30rem] rounded-full bg-sky-200/60 blur-3xl" />
           <div className="absolute right-8 top-16 h-[18rem] w-[18rem] rounded-full border border-sky-200/80" />
 
           <div className="relative max-w-3xl">
@@ -123,7 +136,7 @@ export default function Page() {
                       onChange={(event) => setDestination(event.target.value)}
                       aria-label="Destination"
                       className="w-full border-0 bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400"
-                      placeholder="Anywhere"
+                      placeholder="Pune"
                     />
                   </div>
                 </div>
@@ -132,9 +145,13 @@ export default function Page() {
                   <CalendarDays className="h-4 w-4 text-sky-700" />
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Check in</p>
-                    <button type="button" className="mt-1 text-left text-sm font-semibold text-slate-800">
-                      Jun 18, 2025
-                    </button>
+                    <input
+                      type="date"
+                      value={checkIn}
+                      onChange={(event) => setCheckIn(event.target.value)}
+                      className="mt-1 w-full border-0 bg-transparent text-sm font-semibold text-slate-800 outline-none"
+                      aria-label="Check-in date"
+                    />
                   </div>
                 </div>
 
@@ -142,9 +159,14 @@ export default function Page() {
                   <CalendarDays className="h-4 w-4 text-sky-700" />
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Check out</p>
-                    <button type="button" className="mt-1 text-left text-sm font-semibold text-slate-800">
-                      Jun 22, 2025
-                    </button>
+                    <input
+                      type="date"
+                      value={checkOut}
+                      min={checkIn || undefined}
+                      onChange={(event) => setCheckOut(event.target.value)}
+                      className="mt-1 w-full border-0 bg-transparent text-sm font-semibold text-slate-800 outline-none"
+                      aria-label="Check-out date"
+                    />
                   </div>
                 </div>
 
@@ -188,6 +210,7 @@ export default function Page() {
 
                 <button
                   type="button"
+                  onClick={handleSearch}
                   className="inline-flex min-h-[72px] items-center justify-center gap-2 rounded-2xl bg-[#f2643d] px-6 text-sm font-semibold text-white shadow-lg shadow-orange-200 transition hover:-translate-y-0.5 hover:bg-[#e4572d]"
                 >
                   <Search className="h-4 w-4" />
