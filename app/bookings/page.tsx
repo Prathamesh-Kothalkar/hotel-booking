@@ -76,6 +76,9 @@ export default function BookingsPage() {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
   const [isDetailLoading, setIsDetailLoading] = useState(false)
   const [detailError, setDetailError] = useState('')
+  const [isCancelling, setIsCancelling] = useState(false)
+  const [cancelError, setCancelError] = useState('')
+  const [cancelSuccess, setCancelSuccess] = useState(false)
 
   useEffect(() => {
     const token = getAuthToken()
@@ -129,6 +132,8 @@ export default function BookingsPage() {
 
     setIsDetailLoading(true)
     setDetailError('')
+    setCancelError('')
+    setCancelSuccess(false)
 
     try {
       const response = await fetch(getApiUrl(`/bookings/${bookingId}`), {
@@ -156,6 +161,65 @@ export default function BookingsPage() {
       setDetailError('Unable to connect to the server. Please try again.')
     } finally {
       setIsDetailLoading(false)
+    }
+  }
+
+  async function cancelBooking() {
+    if (!selectedBooking) return
+
+    const token = getAuthToken()
+    if (!token) {
+      clearAuthToken()
+      setIsAuthenticated(false)
+      setDetailError('Please log in first to cancel this booking.')
+      return
+    }
+
+    setIsCancelling(true)
+    setCancelError('')
+    setCancelSuccess(false)
+
+    try {
+      const response = await fetch(getApiUrl(`/bookings/${selectedBooking.bookingId}/cancel`), {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.status === 401) {
+        clearAuthToken()
+        setIsAuthenticated(false)
+        setCancelError('Your session has expired. Please log in again.')
+        return
+      }
+
+      if (response.status === 403) {
+        setCancelError('You are not authorized to cancel this booking.')
+        return
+      }
+
+      if (response.status === 409) {
+        setCancelError('This booking is already cancelled or already has a refund request.')
+        return
+      }
+
+      if (!response.ok) {
+        setCancelError('Unable to cancel this booking. Please try again.')
+        return
+      }
+
+      const cancelledBooking = { ...selectedBooking, status: 'CANCELLED' }
+      setSelectedBooking(cancelledBooking)
+      setBookings((current) => current.map((booking) => (
+        booking.bookingId === cancelledBooking.bookingId ? cancelledBooking : booking
+      )))
+      setCancelSuccess(true)
+    } catch {
+      setCancelError('Unable to connect to the server. Please try again.')
+    } finally {
+      setIsCancelling(false)
     }
   }
 
@@ -334,13 +398,23 @@ export default function BookingsPage() {
                   </div>
                 )}
                 <div className="sm:col-span-2">
+                  {cancelSuccess && (
+                    <p className="mb-3 text-sm text-emerald-700" role="status">
+                      Booking cancelled and refund request created.
+                    </p>
+                  )}
+                  {cancelError && (
+                    <p className="mb-3 text-sm text-red-600" role="alert">{cancelError}</p>
+                  )}
                   <button
                     type="button"
-                    disabled={selectedBooking.status === 'CANCELLED'}
-                    title="Cancellation API endpoint has not been provided"
+                    onClick={cancelBooking}
+                    disabled={selectedBooking.status === 'CANCELLED' || isCancelling}
                     className="rounded-xl border border-red-200 px-5 py-3 font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {selectedBooking.status === 'CANCELLED' ? 'Booking cancelled' : 'Cancel booking'}
+                    {selectedBooking.status === 'CANCELLED'
+                      ? 'Booking cancelled'
+                      : isCancelling ? 'Cancelling booking...' : 'Cancel booking'}
                   </button>
                 </div>
               </div>
