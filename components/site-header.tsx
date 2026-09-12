@@ -37,6 +37,7 @@ export function SiteHeader() {
           {isLoggedIn ? (
             <>
               <Link href="/bookings">Bookings</Link>
+              <Link href="/refunds">Refunds</Link>
               <button className="border-red-600 icon-text-button" type="button" onClick={handleLogout}>
                 Log out
               </button>
@@ -78,6 +79,9 @@ export function SiteHeader() {
             <>
               <Link href="/bookings" onClick={() => setMenuOpen(false)}>
                 Bookings
+              </Link>
+              <Link href="/refunds" onClick={() => setMenuOpen(false)}>
+                Refunds
               </Link>
               <button className="border-red-600 icon-text-button" type="button" onClick={handleLogout}>
                 Log out
