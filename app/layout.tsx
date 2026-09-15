@@ -1,5 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
+import { HotelAiAssistant } from '@/components/hotel-ai-assistant'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <link rel="icon" href="/favicon.png" sizes="any" />
       <body className="antialiased">
         {children}
+        <HotelAiAssistant />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

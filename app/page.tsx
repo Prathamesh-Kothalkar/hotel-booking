@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { openHotelAssistant } from '@/components/hotel-ai-assistant'
 import { SiteHeader } from '@/components/site-header'
 import {
   ArrowRight,
@@ -13,7 +14,6 @@ import {
   SlidersHorizontal,
   Sparkles,
   UserRound,
-  X,
 } from 'lucide-react'
 
 const hotels = [
@@ -75,7 +75,6 @@ const destinations = [
 
 export default function Page() {
   const router = useRouter()
-  const [assistantOpen, setAssistantOpen] = useState(false)
   const [saved, setSaved] = useState<string[]>([])
   const [destination, setDestination] = useState('Anywhere')
   const [guestsOpen, setGuestsOpen] = useState(false)
@@ -296,7 +295,7 @@ export default function Page() {
                     <span>
                       From <strong>{hotel.price}</strong> <small>/ night</small>
                     </span>
-                    <button type="button" onClick={() => setAssistantOpen(true)}>
+                    <button type="button" onClick={openHotelAssistant}>
                       Ask Hotel.ai
                       <ArrowRight className="h-4 w-4" />
                     </button>
@@ -318,7 +317,7 @@ export default function Page() {
             <h2>Ask Hotel.ai anything.</h2>
             <p>“Is this neighborhood good for a first visit?” “Find me a quiet room with a bathtub.”</p>
           </div>
-          <button type="button" className="dark-button" onClick={() => setAssistantOpen(true)}>
+          <button type="button" className="dark-button" onClick={openHotelAssistant}>
             Chat with Hotel.ai
             <ArrowRight className="h-4 w-4" />
           </button>
@@ -348,58 +347,6 @@ export default function Page() {
         </div>
       </footer>
 
-      {assistantOpen && (
-        <div className="assistant-overlay" role="presentation" onClick={() => setAssistantOpen(false)}>
-          <aside
-            className="assistant-drawer"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="assistant-title"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="drawer-header">
-              <div>
-                <span className="section-kicker">Hotel.ai concierge</span>
-                <h2 id="assistant-title">How can I help?</h2>
-              </div>
-              <button type="button" aria-label="Close assistant" onClick={() => setAssistantOpen(false)}>
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="assistant-message">
-              <div className="assistant-avatar">
-                <Sparkles className="h-4 w-4" />
-              </div>
-              <p>Hi there. Tell me where you’re going, or the kind of stay you’re dreaming about.</p>
-            </div>
-
-            <div className="suggestion-list">
-              <button type="button">
-                Find a romantic weekend
-                <ArrowRight className="h-4 w-4" />
-              </button>
-              <button type="button">
-                Best hotels near the beach
-                <ArrowRight className="h-4 w-4" />
-              </button>
-              <button type="button">
-                Help me choose a destination
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="drawer-input">
-              <input placeholder="Ask anything about your stay..." aria-label="Ask Hotel.ai" />
-              <button type="button" aria-label="Send question">
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-
-            <small className="signin-note">Sign in to save your conversations and bookings.</small>
-          </aside>
-        </div>
-      )}
     </main>
   )
 }

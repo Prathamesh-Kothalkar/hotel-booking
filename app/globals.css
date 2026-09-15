@@ -573,6 +573,30 @@
   background: rgba(11, 20, 28, 0.38);
 }
 
+.assistant-launcher {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 55;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--primary);
+  color: white;
+  padding: 0.8rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  box-shadow: 0 12px 28px rgba(18, 100, 163, 0.3);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.assistant-launcher:hover {
+  background: #0f4f7b;
+  transform: translateY(-2px);
+}
+
 .assistant-drawer {
   display: flex;
   flex-direction: column;
@@ -629,6 +653,70 @@
   line-height: 1.65;
 }
 
+.assistant-message-user {
+  margin-top: 1rem;
+  justify-content: flex-end;
+  background: #e6f2f7;
+}
+
+.assistant-conversation {
+  display: flex;
+  flex-direction: column;
+  max-height: 18rem;
+  margin-top: 1.4rem;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
+.assistant-typing,
+.assistant-error {
+  display: block;
+  margin-top: 0.8rem;
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+}
+
+.assistant-error {
+  color: #b42318;
+}
+
+.assistant-login-prompt {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.assistant-login-prompt .assistant-icon {
+  margin-inline: auto;
+}
+
+.assistant-login-prompt h3 {
+  margin: 1.2rem 0 0;
+  color: var(--foreground);
+  font-size: 1.2rem;
+}
+
+.assistant-login-prompt p {
+  margin: 0.6rem auto 0;
+  max-width: 18rem;
+  color: var(--muted-foreground);
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+.assistant-login-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.3rem;
+  border-radius: 0.85rem;
+  background: var(--primary);
+  color: white;
+  padding: 0.8rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
 .suggestion-list {
   display: flex;
   flex-direction: column;
@@ -654,6 +742,11 @@
 .suggestion-list button:hover {
   border-color: rgba(18, 100, 163, 0.4);
   color: var(--primary);
+}
+
+.suggestion-list button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .drawer-input {
@@ -685,6 +778,11 @@
   background: var(--primary);
   color: white;
   padding: 0.7rem;
+}
+
+.drawer-input button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .signin-note {
@@ -761,6 +859,11 @@
 
   .assistant-drawer {
     padding: 1.25rem;
+  }
+
+  .assistant-launcher {
+    right: 0.8rem;
+    bottom: 0.8rem;
   }
 }
 
