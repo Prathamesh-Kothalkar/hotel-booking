@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { ArrowRight, MessageCircle, Send, Sparkles, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { clearAuthToken, getApiUrl, getAuthToken } from '@/lib/auth'
+import { ChatMessage, EnhancedChatResponse, ResponseType, RoomResult } from '@/lib/Hotel-booking.types'
+import { LoadingDots, MessageRenderer } from '@/components/chat-message-renderer'
 
 export const ASSISTANT_OPEN_EVENT = 'hotel-ai:open-assistant'
 
@@ -15,9 +17,10 @@ export function HotelAiAssistant() {
   const [open, setOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [question, setQuestion] = useState('')
-  const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([])
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState('')
+  const [sessionId, setSessionId] = useState(() => crypto.randomUUID());
 
   useEffect(() => {
     const handleOpen = () => {
@@ -39,14 +42,18 @@ export function HotelAiAssistant() {
     const token = getAuthToken()
 
     if (!trimmedMessage || isSending) return
-
     if (!token) {
       setIsLoggedIn(false)
       setError('Please log in to chat with Hotel.ai.')
       return
     }
 
-    setMessages((current) => [...current, { role: 'user', content: trimmedMessage }])
+    setMessages((current) => [...current, {
+      reply: trimmedMessage,
+      responseType: ResponseType.TEXT,
+      type: 'user',
+      timestamp: new Date(),
+    }])
     setQuestion('')
     setError('')
     setIsSending(true)
@@ -58,7 +65,7 @@ export function HotelAiAssistant() {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: trimmedMessage }),
+        body: JSON.stringify({ message: trimmedMessage, sessionId }),
       })
 
       if (response.status === 401) {
@@ -73,13 +80,13 @@ export function HotelAiAssistant() {
         return
       }
 
-      const data: { reply?: string } = await response.json()
-      if (!data.reply) {
+      const data: EnhancedChatResponse = await response.json()
+      if (!data.reply && data.responseType !== ResponseType.ERROR) {
         setError('The assistant returned an empty response. Please try again.')
         return
       }
 
-      setMessages((current) => [...current, { role: 'assistant', content: data.reply! }])
+      setMessages((current) => [...current, { ...data, type: 'bot', timestamp: new Date() }])
     } catch {
       setError('Unable to connect to the assistant. Please try again.')
     } finally {
@@ -90,6 +97,14 @@ export function HotelAiAssistant() {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     void sendMessage(question)
+  }
+
+  function handleAction(action: string) {
+    void sendMessage(action)
+  }
+
+  function handleRoomSelect(room: RoomResult) {
+    void sendMessage(`I want to select room ${room.roomId} at ${room.hotelName}.`)
   }
 
   return (
@@ -141,17 +156,16 @@ export function HotelAiAssistant() {
                       <p>Hi there. Tell me where you’re going, or the kind of stay you’re dreaming about.</p>
                     </div>
                   )}
+
                   {messages.map((message, index) => (
-                    <div key={`${message.role}-${index}`} className={`assistant-message ${message.role === 'user' ? 'assistant-message-user' : ''}`}>
-                      {message.role === 'assistant' && (
-                        <div className="assistant-avatar">
-                          <Sparkles className="h-4 w-4" />
-                        </div>
-                      )}
-                      <p>{message.content}</p>
+                    <div key={`${message.type ?? 'bot'}-${index}`} className={`mb-3 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[92%] rounded-2xl px-3 py-2 text-sm ${message.type === 'user' ? 'bg-linear-to-r from-blue-500 to-indigo-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
+                        <MessageRenderer message={message} onAction={handleAction} onRoomSelect={handleRoomSelect} />
+                      </div>
                     </div>
                   ))}
-                  {isSending && <p className="assistant-typing" role="status">Hotel.ai is thinking...</p>}
+
+                  {isSending && <div className="mb-3 flex justify-start"><div className="rounded-2xl bg-gray-100 text-gray-800"><LoadingDots /></div></div>}
                 </div>
 
                 <div className="suggestion-list">
