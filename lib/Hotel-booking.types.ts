@@ -11,6 +11,7 @@
 export enum ResponseType {
   SEARCH_RESULTS = 'SEARCH_RESULTS',
   BOOKING_CONFIRMATION = 'BOOKING_CONFIRMATION',
+  ALL_BOOKINGS = 'ALL_BOOKINGS',
   ROOM_SELECTED = 'ROOM_SELECTED',
   QUESTION = 'QUESTION',
   TEXT = 'TEXT',
@@ -75,6 +76,7 @@ export interface BookingConfirmation {
   totalAmount: number;
   status: string; // CONFIRMED, PENDING, CANCELLED
   bookingDate?: string;
+  bookingsList?: BookingConfirmation[] | null;
 }
 
 /**

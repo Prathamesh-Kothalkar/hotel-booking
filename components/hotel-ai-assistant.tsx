@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { clearAuthToken, getApiUrl, getAuthToken } from '@/lib/auth'
 import { ChatMessage, EnhancedChatResponse, ResponseType, RoomResult } from '@/lib/Hotel-booking.types'
 import { LoadingDots, MessageRenderer } from '@/components/chat-message-renderer'
+import Image from 'next/image'
 
 export const ASSISTANT_OPEN_EVENT = 'hotel-ai:open-assistant'
 
@@ -147,15 +148,15 @@ export function HotelAiAssistant() {
               </div>
             ) : (
               <>
-                <div className="assistant-conversation" aria-live="polite">
-                  {messages.length === 0 && (
-                    <div className="assistant-message">
-                      <div className="assistant-avatar">
-                        <Sparkles className="h-4 w-4" />
-                      </div>
-                      <p>Hi there. Tell me where you’re going, or the kind of stay you’re dreaming about.</p>
+                <div className={`assistant-conversation ${messages.length === 0 ? 'is-empty' : 'has-messages'}`} aria-live="polite">
+                  {messages.length === 0 ? (
+                    <div className="assistant-welcome">
+                      <Image src={"/logo-booking.png"} width={45} height={45} alt="logo"/>
+                      <span className="section-kicker">Your personal concierge</span>
+                      <h3>Plan a stay that feels effortless.</h3>
+                      <p>Tell me where you’re going, or the kind of stay you’re dreaming about.</p>
                     </div>
-                  )}
+                  ) : null}
 
                   {messages.map((message, index) => (
                     <div key={`${message.type ?? 'bot'}-${index}`} className={`mb-3 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -168,14 +169,16 @@ export function HotelAiAssistant() {
                   {isSending && <div className="mb-3 flex justify-start"><div className="rounded-2xl bg-gray-100 text-gray-800"><LoadingDots /></div></div>}
                 </div>
 
-                <div className="suggestion-list">
-                  {['Find a romantic weekend', 'Best hotels near the beach', 'Help me choose a destination'].map((suggestion) => (
-                    <button key={suggestion} type="button" disabled={isSending} onClick={() => void sendMessage(suggestion)}>
-                      {suggestion}
-                      <ArrowRight className="h-4 w-4" />
-                    </button>
-                  ))}
-                </div>
+                {messages.length === 0 && (
+                  <div className="suggestion-list" aria-label="Suggested questions">
+                    {['Find a romantic weekend', 'Best hotels near the beach', 'Help me choose a destination'].map((suggestion) => (
+                      <button key={suggestion} type="button" disabled={isSending} onClick={() => void sendMessage(suggestion)}>
+                        <span>{suggestion}</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 <form className="drawer-input" onSubmit={handleSubmit}>
                   <input disabled={isSending} value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="Ask anything about your stay..." aria-label="Ask Hotel.ai" />
