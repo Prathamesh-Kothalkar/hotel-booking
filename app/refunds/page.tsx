@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { AccountCard, AccountShell } from '@/components/account-shell'
 import { clearAuthToken, getApiUrl, getAuthToken } from '@/lib/auth'
+import { RefundListSkeleton } from '@/components/ui/page-skeleton'
 
 type Hotel = {
   name: string
@@ -146,7 +147,7 @@ export default function RefundsPage() {
   if (isLoading) {
     return (
       <AccountShell title="Refunds & support" description="Loading your refund history...">
-        <p className="text-sm text-slate-600" role="status">Checking your login...</p>
+        <RefundListSkeleton />
       </AccountShell>
     )
   }

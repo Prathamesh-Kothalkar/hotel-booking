@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { AccountCard, AccountShell } from '@/components/account-shell'
 import { clearAuthToken, getApiUrl, getAuthToken } from '@/lib/auth'
+import { BookingListSkeleton } from '@/components/ui/page-skeleton'
 
 type Hotel = {
   id: number
@@ -231,7 +232,7 @@ export default function BookingsPage() {
   if (isLoading) {
     return (
       <AccountShell title="My bookings" description="Loading your stays...">
-        <p className="text-sm text-slate-600" role="status">Checking your login...</p>
+        <BookingListSkeleton />
       </AccountShell>
     )
   }

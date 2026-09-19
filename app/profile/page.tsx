@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { AccountCard, AccountShell } from '@/components/account-shell'
 import { clearAuthToken, getApiUrl, getAuthToken } from '@/lib/auth'
+import { ProfileSkeleton } from '@/components/ui/page-skeleton'
 
 type UserProfile = {
   name: string
@@ -82,7 +83,7 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <AccountShell title="Profile settings" description="Loading your profile...">
-        <p className="text-sm text-slate-600" role="status">Checking your login...</p>
+        <ProfileSkeleton />
       </AccountShell>
     )
   }

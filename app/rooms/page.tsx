@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { CalendarDays, ChevronLeft, ChevronRight, MapPin, Search, SlidersHorizontal, Star, Users } from 'lucide-react'
 import { SiteHeader } from '@/components/site-header'
 import { getApiUrl, getAuthToken } from '@/lib/auth'
+import { RoomResultsSkeleton } from '@/components/ui/page-skeleton'
 
 type Hotel = {
   id: number
@@ -286,7 +287,7 @@ export default function RoomsPage() {
         </div>
 
         {isLoading ? (
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3"><LoadingCard /><LoadingCard /><LoadingCard /></div>
+          <RoomResultsSkeleton />
         ) : error ? (
           <div className="rounded-2xl border border-red-100 bg-red-50 p-6 text-red-700" role="alert">{error}</div>
         ) : results.content.length === 0 ? (
@@ -393,6 +394,3 @@ function RoomCard({ room, onBook }: { room: Room; onBook: (room: Room) => void }
   )
 }
 
-function LoadingCard() {
-  return <div className="h-107.5 animate-pulse rounded-3xl border border-slate-200 bg-white"><div className="h-56 rounded-t-3xl bg-slate-200" /><div className="space-y-4 p-5"><div className="h-5 w-3/4 rounded bg-slate-200" /><div className="h-4 w-1/2 rounded bg-slate-100" /><div className="h-16 rounded bg-slate-100" /></div></div>
-}
